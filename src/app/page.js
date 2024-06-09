@@ -1,9 +1,10 @@
-import Image from "next/image";
+import Feed from "@/components/Feed";
+
 
 export default function Home() {
   return (
-   <div className="text-red-700">
-    home
-   </div>
+   <>
+    <Feed/>
+   </>
   );
 }

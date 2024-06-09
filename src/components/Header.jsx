@@ -9,6 +9,7 @@ import {HiCamera } from "react-icons/hi"
 import {AiOutlineClose} from "react-icons/ai"
 import { app } from "@/firebase";
 import {getDownloadURL, getStorage, uploadBytesResumable,ref} from "firebase/storage"
+import {Timestamp, addDoc, collection,getFirestore, serverTimestamp} from 'firebase/firestore'
 
 
 const Header = () => {
@@ -16,7 +17,10 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile,setSelectedFile] = useState(null);
   const [imageFileUrl,setImageFileUrl] = useState(null);
+  const [postUploading,setPostUploading] = useState(false);
+  const [caption,setCaption] = useState('');
   const [imageFileUploading,setImageFileUploading] = useState(false);
+  const db = getFirestore(app);
   const filePickerRef = useRef(null);
 
   function addImageToPost(e){
@@ -59,6 +63,21 @@ const Header = () => {
       });
     }
    )
+  }
+
+  async function handleSubmit(){
+   setPostUploading(true);
+   const docRef = await addDoc(collection(db,'posts'),{
+    username: session.user.username,
+    caption,
+    profileImg:session.user.image,
+    image:imageFileUrl,
+    Timestamp:serverTimestamp(),
+   });
+   setPostUploading(false);
+   setIsOpen(false);
+ location.reload();
+
   }
 
   return (
@@ -126,8 +145,10 @@ const Header = () => {
             <input hidden  ref={filePickerRef} type="file" accept="image/*" onChange={addImageToPost} />
           </div>
           
-          <input type="text" maxLength='150' placeholder="plase enter you caption" className="m-4 border-none text-center w-full focus:ring-0 outline-none" />
-          <button disabled className="w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100">Upload Post</button>
+          <input onChange={(e) =>setCaption(e.target.value)} type="text" maxLength='150' placeholder="plase enter you caption" className="m-4 border-none text-center w-full focus:ring-0 outline-none" />
+          <button onClick={handleSubmit} disabled={
+            !selectedFile || !caption.trim() ==='' || postUploading || imageFileUploading
+          } className="w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100">Upload Post</button>
           <AiOutlineClose onClick={() => setIsOpen(false)} className="cursor-pointer absolute top-2 right-2 hover:text-red-600 transition duration-300"/>
         </Modal>
       )}
