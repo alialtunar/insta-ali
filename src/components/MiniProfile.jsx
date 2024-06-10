@@ -3,9 +3,14 @@ import { useSession,signIn,signOut } from "next-auth/react"
 
 const MiniProfile = () => {
   const {data:session} = useSession();
+  console.log(session);
   return (
-    <div className="flex items-center justify-between mt-14 ml-10">
-      <img className="w-16 h-16 rounded-full border p-[2px]"  src={session?.user?.image || '/800px-Instagram_logo_2016.webp'} alt="user-profile-pic" />
+    <div className="flex items-center justify-between mt-14 ml-10 w-full">
+    <img
+        src={session?.user?.image || '/800px-Instagram_logo_2016.webp'}
+        alt='user-profile-pic or instagram logo'
+        className='w-16 h-16 rounded-full border p-[2px]'
+      />
       
       <div className="flex-1 ml-4">
         <h2 className="font-bold">
